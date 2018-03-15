@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html>
+<title>VITCMUN</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<body style="font-family:verdana; !important">
+  <link rel="stylesheet" href="{{ url_for('static', filename='assets/w3.css') }}">
+  <script type="text/javascript" src="{{ url_for('static', filename='assets/socket.io.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='assets/jquery.min.js') }}"></script>
+<!-- This is the start of the script and th css-->
+
+
+<style>
+  body
+{
+    margin:0;
+    background-color: rgb(32,34,37);
+      }
+  .left
+  {
+    height:auto;
+    background-color:#fc775f;
+    font-weight:bold;
+    display: inline-block;
+    margin-left: 1%;
+    margin-right:1%;
+    margin-bottom: 300%;
+    position:absolute;
+    padding: 2%;
+    color:white;
+    left:0;
+    max-width: 40%;
+    border-radius: 15% 5% 25% 0%;
+    word-wrap: break-word;
+  }
+
+  #sendto
+  {
+    position: relative;
+    color:white;
+    font-weight: bold;
+    left:1.2em;
+  }
+/* width */
+  ::-webkit-scrollbar {
+      width: 10px;
+  }
+
+  /* Track */
+  ::-webkit-scrollbar-track {
+    background: rgb(54,57,62);
+
+  }
+
+  /* Handle */
+  ::-webkit-scrollbar-thumb {
+      background: black;
+      border-style: solid;
+      border-width:1px;
+      border-color: gray;
+  }
+
+  /* Handle on hover */
+  ::-webkit-scrollbar-thumb:hover {
+      background: black;
+  }
+  ::-webkit-scrollbar-corner { background: rgb(54,57,62) }
+
+.right
+  {
+    height:auto;
+    margin-left: 1%;
+    margin-right:1%;
+    margin-bottom: 300%;
+    max-width: 40%;
+    padding: 2%;
+    font-weight: bold;
+    background-color:#5f72fc;
+    color:white;
+    position:absolute;
+    display:inline-block;
+    border-radius: 5% 15% 0% 25%;
+    right:0;
+    word-wrap: break-word;
+  }
+  .beech
+  {
+    height:auto;
+    margin-left: 1%;
+    margin-right:1%;
+    margin-bottom: 300%;
+    max-width: 40%;
+    padding: 2%;
+    font-weight: bold;
+    background-color:black;
+    color:white;
+    border: 3px solid white;
+    position:absolute;
+    display:inline-block;
+    border-radius: 0%;
+    right:50%;
+    word-wrap: break-word;
+  }
+#messages
+{
+  background-color: rgb(32,34,37);
+  word-wrap: break-word;
+  overflow-y: scroll;
+}
+
+
+#deli
+{
+  position:absolute;
+  left:10vw;
+  top:2vh;
+}
+
+/*this is the css for the bubble to be created*/
+
+
+.box1 {
+  width: 45%;
+  margin-bottom: 50px;
+  margin-left: 10px;
+  /*border: 2px solid white;*/
+  padding: 5px;
+  font-size: 1.2em;
+  text-align: center;
+  background-color: rgb(72,75,82);
+  color: white;
+  font-family: helvetica;
+  position: relative;
+  box-shadow: 1px 1px 5px #222;
+}
+#sendb
+{
+  position:relative;
+}
+
+.box12 {
+  width: 45%;
+  margin-bottom: 50px;
+  margin-left: 52vw;
+  background-color: rgb(218, 218, 218);
+  /*border: 2px solid white;*/
+  padding: 5px;
+  font-size: 1.2em;
+  right:0;
+  text-align: center;
+  color: rgb(0, 0, 0);
+  font-family: helvetica;
+  position: relative;
+  box-shadow: 1px 1px 5px #222;
+}
+
+/* speech bubble 5 */
+
+.sb5:before {
+  content: "";
+  width: 0px;
+  height: 0px;
+  position: absolute;
+  border-left: 10px solid rgb(218, 218, 218);
+  border-right: 10px solid transparent;
+  border-top: 10px solid rgb(218, 218,218);
+  border-bottom: 10px solid transparent;
+  right: -21px;
+  top: 6px;
+}
+
+.sb5:after {
+  content: "";
+  width: 0px;
+  height: 0px;
+  position: absolute;
+  border-left: 7px solid rgb(218,218,218);
+  border-right: 9px solid transparent;
+  border-top: 9px solid rgb(218,218,218);
+  border-bottom: 7px solid transparent;
+  right: -16px;
+  top: 8px;
+}
+
+/* speech bubble 6 */
+
+.sb6:before {
+  content: "";
+  width: 0px;
+  height: 0px;
+  position: absolute;
+  border-left: 10px solid transparent;
+  border-right: 9px solid #353535;
+  border-top: 10px solid #353535;
+  border-bottom: 10px solid transparent;
+  left: -21px;
+  top: 6px;
+}
+
+.sb6:after {
+  content: "";
+  width: 0px;
+  height: 0px;
+  position: absolute;
+  border-left: 15px solid transparent;
+  border-right: 15px solid rgb(72,75,82);
+  border-top: 15px solid rgb(72,75,82);
+  border-bottom: 10px solid transparent;
+  left: -17px;
+  top: 8px;
+}
+
+
+/*This is the end of the css for the text bubble under development*/
+</style>
+<script type="text/javascript">
+function getCookie(cname) {
+var name = cname + "=";
+var decodedCookie = decodeURIComponent(document.cookie);
+var ca = decodedCookie.split(';');
+for(var i = 0; i <ca.length; i++) {
+    var c = ca[i];
+    while (c.charAt(0) == ' ') {
+        c = c.substring(1);
+    }
+    if (c.indexOf(name) == 0) {
+        return c.substring(name.length, c.length);
+    }
+}
+return "";
+}
+function Filter()
+{
+  inpu=String($('#myInput').val()).toUpperCase();
+  all=$('#rec').children()
+  for(i=0;i<all.length;i++)
+  {
+    if((String(all[i].innerHTML).toUpperCase()).indexOf(inpu) >= 0)
+    {
+       all[i].style.display=""
+    }
+    else
+    {
+        all[i].style.display="none"
+    }
+  }
+}
+ currentusers=[]
+ var chatbuddy
+ contacts=[]
+ seechits=[]
+ $(document).ready(function()
+ {
+   $('#chitview').hide()
+   $('#sendto').html("No one is selected")
+   str=window.location.href
+   ghar=(str).substr((str).indexOf('//')+2)
+   //ghar=(ghar).substr((ghar).indexOf('//')+)
+   var socket=io.connect(ghar);
+   var sreg=io.connect(ghar + 'reg')
+   var us=getCookie('Loginwala')
+   var sele
+   sreg.emit('regi',us)
+   $('#deli').html(us.toUpperCase())
+   $('#logout').on('click',function(){
+      socket.emit("savelog")
+      document.cookie='Loginwala' + '=;expiresThu, 01 Jan 1970 00:00:01 GMT;';
+      window.location.replace(str)
+   });
+   socket.on("connect",function()
+   {
+     socket.send(us);
+   });
+    sreg.emit('refchats',us)
+    sreg.on('prevchats',function(logi)
+    {
+        for(var i in logi)
+      {
+         currentusers.push(i)
+         $('#rec').append("<div id='rece_" + i + "' class='sidebar w3-padding-16 w3-black w3-center w3-ripple w3-hover-gray' style='width:100%'>" + i + '</div>')
+         $("#messages").append('<div style="width:70%;" ' + 'id=sender_' + i +' '+ '>'+ '</div>');
+         $(('#sender_' + i)).hide()
+         $(('#sender_' + i)).append(logi[i])
+      }
+    });
+
+    sreg.on('prechits',function(chit)
+    {
+       for(var i in chit)
+       {
+        mess1="<p class='box1 sb6' style='font-size:1em;' ><span style='color:white;font-weight:lighter;font-size:0.7em;'>" + chit[i][3] + '</span>';
+        mess2='<br/>'+ chit[i][2] +' ---> '+chit[i][0]+'<br/>';
+        mess3= chit[i][1]+'</p>'
+        sentchit=mess1 + mess2 + mess3;
+        $('#chitview').append(sentchit)
+       }
+    });
+
+    $('#chits').on('click',function()
+    {
+      if($('#chitview').is(':visible'))
+      {
+      $('#chitview').hide();
+      $((chatbuddy)).show();
+      }
+      else
+      {
+        $((chatbuddy)).hide();
+        $('#chitview').show();
+      }
+    });
+    socket.on('chits',function(chit)
+    {
+      mess1="<p class='box1 sb6' style='font-size:1em;' ><span style='color:white;font-weight:lighter;font-size:0.7em;'>" + chit[3] + '</span>';
+      mess2='<br/>'+ chit[2] +' ---> '+chit[0]+'<br/>';
+      mess3= chit[1]+'</p>'
+      sentchit=mess1 + mess2 + mess3;
+      $('#chitview').append(sentchit)
+    });
+     sreg.emit('GetOthers',us)
+     sreg.on('GetUserList',function(payload)
+     {
+      for(i=0;i<payload['len'];i++)
+       {
+         nam=payload['key'][i]
+         if(contacts.indexOf(nam)==-1)
+         {
+           contacts.push(nam)
+         }
+         if(currentusers.indexOf(nam)==-1)
+         {
+           currentusers.push(nam)
+           $('#rec').append("<div id='rece_" + nam + "' " + " class='w3-padding-16 w3-hover-gray  w3-border-white w3-black w3-center w3-ripple' style='width:100%'>" + nam + "</div>")
+           $("#messages").append('<div style="width:70%;" ' + 'id=sender_' + nam +' '+ '>'+ '</div>');
+           $(('#sender_' + nam)).hide()
+         }
+       }
+     });
+     $('#rec').on('click','div',function()
+     {
+       if(sele == undefined)
+       {
+         sele=$(this)
+         $(this).attr('class','w3-padding-16 w3-border-bottom w3-border-blue w3-blue w3-center w3-ripple')
+       }
+       else
+       {
+       sele.attr('class','w3-padding-16 w3-border-white w3-black w3-center w3-ripple')
+       sele=$(this)
+       $(this).attr('class','w3-padding-16 w3-border-bottom w3-border-blue w3-blue w3-center w3-ripple')
+       }
+     });
+     $('#rec').on('click',function()
+     {
+       //todo toggle to currently selected user..
+       if(chatbuddy=="")
+       {
+        chatbuddy='#sender_' + sele.text();
+       }
+       $('#chitview').hide();
+       $((chatbuddy)).hide();
+       chatbuddy='#sender_' + sele.text();
+       $((chatbuddy)).show(200);
+       $('#sendto').html("Message To: " + sele.text());
+      });
+     socket.on('new_message',function(payload)
+     {
+       $('#rece_' + payload['sender']).attr('class','sidebar w3-padding-16 w3-hover-white w3-border-bottom w3-border-blue w3-teal w3-center w3-ripple')
+       $('#rece_' + payload['sender']).insertBefore('#rec div:eq(0)')
+     if(contacts.indexOf(payload['sender'])==-1)
+     {
+        contacts.push(payload['sender'])
+     }
+       message_rec='<p class="box1 sb6">' + "<span style='color:white;font-weight:lighter;font-size:1em;'>" + String(new Date()).substr(0,25) + '</span><br/>' + payload['sender'] +  ":<br/>" + payload['message']+'</p><br/><br/>'
+       $(('#sender_' + payload['sender'])).append(message_rec)
+     });
+
+    $('#sendb').click(function()
+    {
+     //todo create new kamra for sent to user,done
+     if($('#sendto').html()=="No one is selected")
+     {
+       alert('please select someone to send messages to')
+     }
+     else if($('#myMessage').val() != "")
+     {
+       rcvr=sele.text()
+       if(contacts.indexOf(rcvr)==-1)
+       {
+           alert("Sorry,this User is not logged in now so your messages wont reach him/her...");
+       }
+       else
+         mess1="<span style='color:black;font-weight:lighter;font-size:1em;'>" + String(new Date()).substr(0,25) + '</span>';
+         mess2='<br/>';
+         mess3=String($('#myMessage').val()).replace(/</g,' lessthan ').replace(/>/g,' greaterthan ') +'</p>'
+         mess_sent='<p class="box12 sb5">' +mess1 + mess2 + mess3;
+         mess_rec='<p class="box1 sb6">'+ mess1 +'<br/>' + us +':<br/>' + mess3;
+         $(('#sender_' + rcvr)).append(mess_sent)
+         socket.emit('updatelogme',{'rece':rcvr,'message':mess_sent,'sender':us});
+         socket.emit('updatelogot',{'rece':us,'message':mess_rec,'sender':rcvr});
+       }
+       socket.emit('sendmess',{'rece':rcvr,'message':$('#myMessage').val().replace(/</g,' lessthan ').replace(/>/g,' greaterthan '),'sender':us});
+       $('#myMessage').val('');
+   });
+$(document).bind('keypress', function(event) {
+if( event.which === 13 && event.shiftKey)
+{
+  if($('#myMessage').val() != "")
+  {
+     if($('#sendto').html()=="No one is selected")
+     {
+       alert('please select someone to send messages to')
+     }
+     else if($('#myMessage').val() != "")
+     {
+       rcvr=sele.text()
+       if(contacts.indexOf(rcvr)==-1)
+       {
+           alert("Sorry,this User is not logged in now so your messages wont reach him/her...");
+       }
+       else
+       {
+         mess1="<span style='color:black;font-weight:lighter;font-size:0.55em;'>" + String(new Date()).substr(0,25) + '</span>';
+         mess2='<br/>'//'<br/>You:'+'<br/>';
+         mess3=String($('#myMessage').val()).replace(/</g,' lessthan ').replace(/>/g,' greaterthan ') +'</p>'
+         mess_sent='<p class="box12 sb5">' +mess1 + mess2 + mess3;
+         mess_rec='<p class="box1 sb6">'+ mess1 +'<br/>' + us +':<br/>' + mess3;
+         $(('#sender_' + rcvr)).append(mess_sent)
+         socket.emit('updatelogme',{'rece':rcvr,'message':mess_sent,'sender':us});
+         socket.emit('updatelogot',{'rece':us,'message':mess_rec,'sender':rcvr});
+         socket.emit('sendmess',{'rece':rcvr,'message':String($('#myMessage').val()).replace(/</g,' lessthan ').replace(/>/g,' greaterthan '),'sender':us});
+       }
+       $('#myMessage').val('');
+   }
+}}
+ });
+});
+</script>
+
+<!--this is the end of the sript and the css-->
+
+<div class="w3-sidebar w3-bar-block w3-collapse w3-card w3-animate-right" style="width:200px; right:0" id="mySidebar">
+  <button class="w3-bar-item w3-button w3-large w3-hide-large" onclick="w3_close()">Close &times;</button>
+  <input type="text" style=" padding-left:30px; height: 10vh; width:100%;color:white;background-color:rgb(0, 5, 22)" id="myInput" onkeyup="Filter()" placeholder="Search Delegates" title="Type in a name">
+  <button class="w3-btn w3-large w3-white w3-ripple" style="width:100%" id="chits">EB Chits</button>
+  <div id="rec" class="w3-border-left w3-border-white" style="border:none; width:100%; height:95vh;  background-color: rgb(32,34,37);">
+  </div>
+</div>
+
+<div class="w3-main" style="margin-right:150px">
+  <div class="">
+
+      <div class="w3-row" style="max-height:11vh !important; background-color:rgb(32,34,37)">
+      <div class="w3-col l10 m9 s9">
+        <div class="w3-container">
+          <img src="{{url_for('static', filename='assets/logovit.png')}}" height="100" width="100"><br>
+        </div>
+      </div>
+      <div class="w3-col l2 m2 s2" style="padding-left:1.2vw">
+          <button style="margin-top:2.1vh" type="button" class="w3-btn w3-round-xxlarge w3-hover-black w3-white  w3-border w3-border-black" id="logout">Log Out</button>
+      </div>
+      <div class="w3-col w3-hide-large m1 s1">
+        <button class="w3-button w3-white w3-xlarge w3-right w3-hide-large" onclick="w3_open()">&#9776;</button>
+      </div>
+    </div>
+    <div class="w3-container" style="width:100%; margin-left: -50">
+      <h3 id="deli" style="color: rgb(255, 255, 255)"></h3>  <!--this is where the name of the delegate we are sending to will be displayed-->
+    </div>
+  </div>
+
+    <div id="messages" class="w3-container w3-center" style=" position: absolute; margin-left:2vw; margin-top:1vh; width:80vw;min-height: 75vh !important;height: 77vh">
+      <div id=chitview></div>
+
+</div>
+<footer class="w3-padding-16" style="position:absolute; bottom:0px; width: 100% !important;">
+    <div id="sendto"></div>
+    <div class="w3-row" style="margin-right:110px">
+      <div class="w3-col l8 m8 s8">
+        <div class="w3-container">
+
+          <textarea class="w3-input" style="resize:none;background-color:rgb(200,200,200);box-shadow:2px 2px 6px #222;" rows="1" id="myMessage"></textarea>
+        </div>
+      </div>
+
+
+      <div class="w3-col l1 m1 s1">
+      <button type="button" class="w3-btn w3-round-xxlarge w3-hover-black w3-white  w3-border w3-border-black" style="box-shadow:2px 2px 6px #222; color:black; background-color:rgb(200,200,200) ;max-height:40px" id="sendb">
+        Send
+      </button>
+      </div>
+    </div>
+  </footer>
+
+
+
+  <script>
+  function w3_open(){
+      document.getElementById("mySidebar").style.display = "block";
+  }
+  function w3_close() {
+      document.getElementById("mySidebar").style.display = "none";
+  }
+  </script>
+
+  </body>
+<style>
+  .sidebar:hover{
+    color: white;
+    background-color: black;
+    cursor:hand;
+  }
+</style>
+
+
+  </html>

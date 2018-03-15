@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>VITCMUN: E-Chit System</title>
+	<link rel="stylesheet" href="{{ url_for('static', filename='assets/demo.css') }}">
+	<link rel="stylesheet" href="{{ url_for('static', filename='assets/form-labels-on-top.css') }}">
+	<link rel="stylesheet" href="{{ url_for('static', filename='assets/scrollbar.css') }}">
+	<link rel="stylesheet" href="{{ url_for('static', filename='assets/w3.css') }}">
+	<script type="text/javascript" src="{{ url_for('static', filename='assets/socket.io.min.js') }}"></script>
+	<script src="{{ url_for('static', filename='assets/jquery.min.js') }}"></script>
+	<script src="{{ url_for('static', filename='assets/main.js')}}"></script>
+<script>
+$(document).ready(function(){
+ $('#login').click(function()
+ {
+	 naam=$("#username").val()
+	 console.log(naam)
+	 $.ajax({
+		  type: 'POST',
+          url: '/session',
+          data: JSON.stringify({session: $('#username').val()}),
+          contentType: 'application/json'
+                });
+	 cook="Loginwala=" + naam +";";
+	 console.log("original cookie supposed to be: " + cook)
+	 document.cookie=cook
+ });
+});
+</script>
+</head>
+<body bgcolor="#1c1c1c">
+	<div id="load" class="blink">
+	</div>
+	<span id="contents">
+	<header id="munlogo">
+		<img id="logovit" src="{{url_for('static', filename='assets/logovit.png')}}" height="150" width="150"><br>
+		VITCMUN E-CHIT SYSTEM
+    </header>
+    <div class="main-content">
+        <form class="form-labels-on-top" method="post" id="form1">
+            <div class="form-title-row">
+                <h1>Login</h1>
+            </div>
+            <div class="form-row">
+                <label>
+                    <span>Username</span>
+                    <input type="text" name="username" id="username">
+                </label>
+            </div>
+			<div class="form-row">
+                <label>
+                    <span>Password</span>
+                    <input type="password" name="password" required>
+                </label>
+            </div>
+            <div class="form-row">
+                <button id="login" type="submit" style="display: block; margin: 0 auto;">Proceed</button>
+            </div>
+    </div>
+	</form>
+
+	<footer id="munfooter">
+		Debate. Delegate. Decimate.<br>
+		©VITCMUN'18
+	</footer>
+</span>
+</body>
+</html>

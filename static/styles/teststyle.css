@@ -1,0 +1,37 @@
+#rec
+{
+  position:absolute;
+  right:10%;
+}
+#myMessage
+{
+  position:absolute;
+  resize: none;
+  top:89%;
+  width:95%;
+  height:10%;
+  color:white;
+  background-color: rgba(100,100,100);
+  text-align:center;
+}
+#deli
+{
+  position:absolute;
+  right:50%;
+  top:10%;
+}
+#sendb
+{
+  position:absolute;
+  background-color: #00d18e;
+  right: 0.5%;
+  top:90.5%;
+  display: block;
+  height:70;
+  width:70;
+  border-radius: 50%;
+  &:hover
+  {
+    background-color:#e6e600;
+  }
+}
