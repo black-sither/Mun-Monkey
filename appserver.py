@@ -104,10 +104,11 @@ def sendi(obj):
         mess=obj['message']
         sender=obj['sender']
         payload={'sender':sender,'message':mess}
-        print('Sender: '+sender +'  Receiver:  ' + recip + ' msg:' + mess + ' sid:' + sendsid)
         emit('new_message',payload,room=sendsid)
+        print('Sender: '+sender +'  Receiver:  ' + recip + ' msg:' + mess + ' sid:' + sendsid)
+        emit('prevchats',messlog[recip],room=sendsid)
     else:
-        print('user:' + session.get('value','') +"tried 2 logins from the same device")
+        print('user:' + session.get('value','') + "tried to change his cookie value" + "new cookie maybe:" + obj['sender'])
 
 @socketio.on('updatelogme')
 def upd(obj):
