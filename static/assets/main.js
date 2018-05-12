@@ -6,8 +6,8 @@ document.onreadystatechange = function (){
   if (state == 'interactive') {
        document.getElementById('contents').style.visibility="hidden";
        function blink_text(){
-        $('#logovit').fadeOut(1000);
-        $('#logovit').fadeIn(1000);
+        $('#logo').fadeOut(1000);
+        $('#logo').fadeIn(1000);
         console.log("blink");
         }
     interval = setInterval(blink_text, 1);

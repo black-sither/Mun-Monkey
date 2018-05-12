@@ -6,7 +6,7 @@
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>VITCMUN: E-Chit System</title>
+	<title>MUN MONKEY: E-Chit System</title>
 	<link rel="stylesheet" href="{{ url_for('static', filename='assets/demo.css') }}">
 	<link rel="stylesheet" href="{{ url_for('static', filename='assets/form-labels-on-top.css') }}">
 	<link rel="stylesheet" href="{{ url_for('static', filename='assets/scrollbar.css') }}">
@@ -19,15 +19,7 @@ $(document).ready(function(){
  $('#login').click(function()
  {
 	 naam=$("#username").val()
-	 console.log(naam)
-	 $.ajax({
-		  type: 'POST',
-          url: '/session',
-          data: JSON.stringify({session: $('#username').val()}),
-          contentType: 'application/json'
-                });
 	 cook="Loginwala=" + naam +";";
-	 console.log("original cookie supposed to be: " + cook)
 	 document.cookie=cook
  });
 });
@@ -38,8 +30,8 @@ $(document).ready(function(){
 	</div>
 	<span id="contents">
 	<header id="munlogo">
-		<img id="logovit" src="{{url_for('static', filename='assets/logovit.png')}}" height="150" width="150"><br>
-		VITCMUN E-CHIT SYSTEM
+		<img id="logo" src="{{url_for('static', filename='assets/mun_logo.png')}}" height="100" width="150"><br>
+		MUN Monkey
     </header>
     <div class="main-content">
         <form class="form-labels-on-top" method="post" id="form1">
@@ -65,8 +57,7 @@ $(document).ready(function(){
 	</form>
 
 	<footer id="munfooter">
-		Debate. Delegate. Decimate.<br>
-		©VITCMUN'18
+		Mun Monkey<br>
 	</footer>
 </span>
 </body>

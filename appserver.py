@@ -22,104 +22,75 @@ try:
     with open('mess.pkl','rb') as f:
         messlogbefore = pickle.load(f)
         messlog=messlogbefore
-        #print(messlog)
     with open('ebchits.pkl','rb') as y:
         ebchits=pickle.load(y)
 except EOFError:
     print('file is empty..')
 
-@app.route('/session', methods=['GET', 'POST'])
-def session_access():
-    if request.method == 'GET':
-        return jsonify({
-            'session': session.get('value', '')
-        })
-    data = request.get_json()
-    if 'session' in data:
-        session['value'] = data['session']
-        return ''
-
 @app.route('/',methods=['GET','POST'])
 def test():
-     if request.method=="POST":
-         conn=mysql.connection.cursor()
-         passw=request.form['password']
-         user=request.form['username']
-         conn.execute("SELECT * from logins where password=%s and username=%s",[passw,user])
-         row=conn.fetchone()
-         if row:
-             #session['Username']=user
-             #lgcnt +=1
-             #if user=="aditya":
-                 #return render_template('index.html')
-             #else:
-             if row[3] =='EB':
-                 return render_template('EBFinal.html')
-             else:
-                 return render_template('DelApps.html')
-             #print("user logged in" + request.sid)
-         else:
-             #return render_template("")
-
+    if request.method=="POST":
+        conn=mysql.connection.cursor()
+        passw=request.form['password']
+        user=request.form['username']
+        conn.execute("SELECT * from logins where password=%s and username=%s",[passw,user])
+        row=conn.fetchone()
+        if row:
+            session['user']=user
+            if row[3] =='EB':
+                return render_template('EBFinal.html')
+            else:
+                return render_template('DelApps.html')
+        else:
              return "Username and/or password incorrect."
+    return render_template("login.html")
 
-         #return request.form['username'] + " logged in"
-     return render_template("login.html")
-#@socketio.on('message')
-#def handlemessage(msg):
-    #print("Message:" + msg)
-    #send(msg,broadcast=True)
-#@socketio.on('connect')
-#def test_connect():
-    #emit('my response', {'data': 'Connected'})
-    #print("connected to user is" + request.sid)
 
-@socketio.on('connect')
-def test_connect():
-    #emit('my response', {'data': 'Connected'})
-    print("")
 @socketio.on('roomc')
 def showroomconnect():
     print("Sid here" + request.sid)
 @socketio.on('connect',namespace="/reg")
 def hello():
-    print('')#'User:' + 'msg' + ' request:' + request.sid)
+    print('')
 
 @socketio.on('regi',namespace="/reg")
 def registeruser(user):
-    #print('User:' + msg + ' request:' + request.sid)
-    usar[user]=request.sid
+    usar[session.get('user')]=request.sid
     if user not in messlog.keys():
         messlog[user]={}
-    print("registered user: " + user +" with sid:" +usar[user])
-    #print(messlog)
+    print("registered user: " + user +" with sid:" +usar[user] + "and session:" + session.get('user'))
 
 @socketio.on('sendmess')
 def sendi(obj):
     if obj['message'].find('<')!=-1 or obj['message'].find('>')!=-1:
-        print(session.get('value', '') +" maybe logged as " +obj['sender']+ "tried to change html");
-    elif obj['sender'] ==session.get('value', ''):
+        print(session.get('user') +" maybe logged as " + obj['sender'] + "tried to change javascript...");
+    elif obj['sender'] ==session.get('user'):
         recip=obj['rece']
-        sendsid=usar[recip]
+        try:
+            sendsid=usar[recip]
+        except KeyError:
+            print("Somehow i am executed...")
+            emit('Usrlgout',room=usar[session.get('user')])
         mess=obj['message']
         sender=obj['sender']
-        payload={'sender':sender,'message':mess}
+        payload={'sender':sender,'message':mess,'eb':obj['eb']}
         emit('new_message',payload,room=sendsid)
-        print('Sender: '+sender +'  Receiver:  ' + recip + ' msg:' + mess + ' sid:' + sendsid)
+        print('Sender: '+ sender +'  Receiver:  ' + recip + ' msg:' + mess + ' sid:' + sendsid)
         emit('prevchats',messlog[recip],room=sendsid)
+        emit('prechits',ebchits,broadcast=True)
     else:
-        print('user:' + session.get('value','') + "tried to change his cookie value" + "new cookie maybe:" + obj['sender'])
+        print('user:' + session.get('user') + "tried to change his cookie value" + "new cookie value is:" + obj['sender'])
 
 @socketio.on('updatelogme')
 def upd(obj):
-    if obj['sender']==session.get('value', ''):
+    if obj['sender']==session.get('user'):
         recip=obj['rece']
         mess=obj['message']
         sender=obj['sender']
         messlog[sender].setdefault(recip,[]).append(mess)
 @socketio.on('updatelogot')
 def upd1(obj):
-    if obj['rece']==session.get('value',''):
+    if obj['rece']==session.get('user'):
         recip=obj['rece']
         mess=obj['message']
         sender=obj['sender']
@@ -132,7 +103,6 @@ def retchats(us):
 
 @socketio.on('GetOthers',namespace='/reg')
 def senduserlist(usur):
-    #print("Get others,registered user:" + usur +"with sid:" +request.sid)
     key=list(usar.keys())
     l=len(key)
     payload={'key':key,'len':l}

@@ -1,14 +1,12 @@
 <!DOCTYPE html>
 <html>
-<title>VITCMUN</title>
+<title>Delegate</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <body  style="font-family:verdana; !important"></body>
 <link rel="stylesheet" href="{{ url_for('static', filename='assets/w3.css') }}">
 <script type="text/javascript" src="{{ url_for('static', filename='assets/socket.io.min.js') }}"></script>
 <script src="{{ url_for('static', filename='assets/jquery.min.js') }}"></script>
 
-
-<!-- This is the start of the script and th css-->
 
 
 <style>
@@ -118,7 +116,6 @@
   width: 45%;
   margin-bottom: 50px;
   margin-left: 10px;
-  /*border: 2px solid white;*/
   padding: 5px;
   font-size: 1.2em;
   text-align: center;
@@ -128,6 +125,22 @@
   position: relative;
   box-shadow: 1px 1px 5px #222;
 }
+
+.box3 {
+  width: 45%;
+  margin-bottom: 50px;
+  margin-left: 10px;
+  padding: 5px;
+  font-size: 1.2em;
+  text-align: center;
+  background-color: rgb(6,93,224);
+  color: white;
+  font-family: helvetica;
+  position: relative;
+  box-shadow: 1px 1px 5px #222;
+}
+
+
 #sendto
 {
   position: relative;
@@ -180,6 +193,32 @@
   border-top: 9px solid rgb(218,218,218);
   border-bottom: 7px solid transparent;
   right: -16px;
+  top: 8px;
+}
+
+.sb7:before {
+  content: "";
+  width: 0px;
+  height: 0px;
+  position: absolute;
+  border-left: 10px solid transparent;
+  border-right: 9px solid rgb(6,93,224);
+  border-top: 10px solid rgb(6,93,224);
+  border-bottom: 10px solid transparent;
+  left: -21px;
+  top: 6px;
+}
+
+.sb7:after {
+  content: "";
+  width: 0px;
+  height: 0px;
+  position: absolute;
+  border-left: 15px solid transparent;
+  border-right: 15px solid rgb(6,93,224);
+  border-top: 15px solid rgb(6,93,224);
+  border-bottom: 10px solid transparent;
+  left: -19px;
   top: 8px;
 }
 
@@ -254,6 +293,9 @@ function Filter()
 
  $(document).ready(function()
  {
+   console.log('Delegates just so you know...We know when you mess with the code...')
+   console.log("there is a reason we have left that cookie like that...your points would be deducted on the basis of how much you messed with the code.....enjoy :)")
+   console.log('Sidenote..This code has no contribution of So called "USG Tech" Ayush Rawal in it....Neither does our website...Thank you...')
    var us;
    us=getCookie('Loginwala');
    $('#chitview').hide()
@@ -286,6 +328,12 @@ function Filter()
            $(('#sender_' + i)).append(logi[i])
       }
     });
+    socket.on("Usrlgout",function()
+    {
+      alert("This user was present in today's council but may have logged out for now... So your message is not being sent...")
+    });
+  
+      
      sreg.emit('GetOthers',us)
      sreg.on('GetUserList',function(payload)
      {
@@ -340,12 +388,20 @@ function Filter()
      {
         contacts.push(payload['sender'])
      }
+     if(payload['eb'] == '0')
+     {
        message_rec='<p class="box1 sb6">' + "<span style='color:white;font-weight:lighter;font-size:0.55em;'>" + String(new Date()).substr(0,25) + '</span><br/>' + payload['sender'] +  ":<br/>" + payload['message']+'</p>'
+       console.log(payload['eb'])
+     }
+     else if(payload['eb'] == '1')
+     {
+      message_rec='<p class="box3 sb7">' + "<span style='color:white;font-weight:lighter;font-size:0.55em;'>" + String(new Date()).substr(0,25) + '</span><br/>' + payload['sender'] +  ":<br/>" + payload['message']+'</p>'
+      console.log(payload['eb'])
+     }
        $(('#sender_' + payload['sender'])).append(message_rec)
      });
 
     $('#sendb').click(function(){
-     //todo create new kamra for sent to user,done
      if($('#sendto').html()=="No one is selected")
      {
        alert('please select someone to send messages to')
@@ -360,7 +416,7 @@ function Filter()
        else
        {
          mess1="<span style='color:black;font-weight:lighter;font-size:0.55em;'>" + String(new Date()).substr(0,25) + '</span>';
-         mess2='<br/>'//'<br/>You:'+'<br/>';
+         mess2='<br/>'
          mess3=String($('#myMessage').val()).replace(/</g,' lessthan ').replace(/>/g,' greaterthan ') +'</p>'
          mess_sent='<p class="box12 sb5">' +mess1 + mess2 + mess3;
          mess_rec='<p class="box1 sb6">'+ mess1 +'<br/>' + us +':<br/>' + mess3;
@@ -368,21 +424,29 @@ function Filter()
          if($('#viaEB').is(':checked'))
          {
            socket.emit('ebchit',{'rece':rcvr,'message':String($('#myMessage').val()).replace(/</g,' lessthan ').replace(/>/g,' greaterthan '),'sender':us,'time':String(new Date()).substr(0,25)})
+           mess_rec='<p class="box3 sb7">'+ mess1 +'<br/>' + us +':<br/>' + mess3;
          }
          socket.emit('updatelogme',{'rece':rcvr,'message':mess_sent,'sender':us});
          socket.emit('updatelogot',{'rece':us,'message':mess_rec,'sender':rcvr});
-         socket.emit('sendmess',{'rece':rcvr,'message':String($('#myMessage').val()).replace(/</g,' lessthan ').replace(/>/g,' greaterthan '),'sender':us});
+         if($('#viaEB').is(':checked'))
+         {
+          socket.emit('sendmess',{'rece':rcvr,'message':String($('#myMessage').val()).replace(/</g,' lessthan ').replace(/>/g,' greaterthan '),'sender':us,'eb':'1'});
+         }
+         else
+         {
+          socket.emit('sendmess',{'rece':rcvr,'message':String($('#myMessage').val()).replace(/</g,' lessthan ').replace(/>/g,' greaterthan '),'sender':us,'eb':'0'});
+         }
+         $('#myMessage').val('');
        }
-       $('#myMessage').val('');
+      
    }
    });
 
-   $(document).bind('keypress', function(event) {
+$(document).bind('keypress', function(event) {
 if( event.which === 13 && event.shiftKey)
 {
   if($('#myMessage').val() != "")
   {
-     //todo create new kamra for sent to user,done
      if($('#sendto').html()=="No one is selected")
      {
        alert('please select someone to send messages to')
@@ -396,8 +460,21 @@ if( event.which === 13 && event.shiftKey)
        }
        else
        {
+        if($('#sendto').html()=="No one is selected")
+     {
+       alert('please select someone to send messages to')
+     }
+     else if($('#myMessage').val() != "")
+     {
+       rcvr=sele.text()
+       if(contacts.indexOf(rcvr)==-1)
+       {
+           alert("Sorry,this User is not logged in now so your messages wont reach him/her...");
+       }
+       else
+       {
          mess1="<span style='color:black;font-weight:lighter;font-size:0.55em;'>" + String(new Date()).substr(0,25) + '</span>';
-         mess2='<br/>'//'<br/>You:'+'<br/>';
+         mess2='<br/>'
          mess3=String($('#myMessage').val()).replace(/</g,' lessthan ').replace(/>/g,' greaterthan ') +'</p>'
          mess_sent='<p class="box12 sb5">' +mess1 + mess2 + mess3;
          mess_rec='<p class="box1 sb6">'+ mess1 +'<br/>' + us +':<br/>' + mess3;
@@ -405,14 +482,24 @@ if( event.which === 13 && event.shiftKey)
          if($('#viaEB').is(':checked'))
          {
            socket.emit('ebchit',{'rece':rcvr,'message':String($('#myMessage').val()).replace(/</g,' lessthan ').replace(/>/g,' greaterthan '),'sender':us,'time':String(new Date()).substr(0,25)})
+           mess_rec='<p class="box3 sb7">'+ mess1 +'<br/>' + us +':<br/>' + mess3;
          }
          socket.emit('updatelogme',{'rece':rcvr,'message':mess_sent,'sender':us});
          socket.emit('updatelogot',{'rece':us,'message':mess_rec,'sender':rcvr});
-         socket.emit('sendmess',{'rece':rcvr,'message':String($('#myMessage').val()).replace(/</g,' lessthan ').replace(/>/g,' greaterthan '),'sender':us});
+         if($('#viaEB').is(':checked'))
+         {
+          socket.emit('sendmess',{'rece':rcvr,'message':String($('#myMessage').val()).replace(/</g,' lessthan ').replace(/>/g,' greaterthan '),'sender':us,'eb':'1'});
+         }
+         else
+         {
+          socket.emit('sendmess',{'rece':rcvr,'message':String($('#myMessage').val()).replace(/</g,' lessthan ').replace(/>/g,' greaterthan '),'sender':us,'eb':'0'});
+         }
+         $('#myMessage').val('');
        }
-       $('#myMessage').val('');
-   }
+    }
 }}
+}
+}
 });
 
  });
@@ -435,7 +522,7 @@ if( event.which === 13 && event.shiftKey)
     <div class="w3-row" style="max-height:11vh !important; background-color:rgb(32,34,37)">
       <div class="w3-col l10 m9 s9">
         <div class="w3-container">
-          <img src="{{url_for('static', filename='assets/logovit.png')}}" height="100" width="100"><br>
+          <img src="{{url_for('static', filename='assets/mun_logo.png')}}" height="90" width="150"><br>
         </div>
       </div>
       <div class="w3-col l2 m2 s2" style="padding-left:1.2vw">
@@ -451,7 +538,6 @@ if( event.which === 13 && event.shiftKey)
   </div>
 
   <div id="messages" class="w3-container w3-center" style=" position: absolute; margin-left:2vw; margin-top:1vh; width:80vw; min-height: 75vh !important;height: 77vh">
-    <!--<div id=chitview></div>-->
 
 </div>
 <footer class="w3-padding-16" style="position:absolute; bottom:0px; width: 100% !important;">

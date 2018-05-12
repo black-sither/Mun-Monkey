@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html>
-<title>VITCMUN</title>
+<title>EB</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <body style="font-family:verdana; !important">
   <link rel="stylesheet" href="{{ url_for('static', filename='assets/w3.css') }}">
@@ -351,7 +351,6 @@ function Filter()
      });
      $('#rec').on('click',function()
      {
-       //todo toggle to currently selected user..
        if(chatbuddy=="")
        {
         chatbuddy='#sender_' + sele.text();
@@ -376,7 +375,6 @@ function Filter()
 
     $('#sendb').click(function()
     {
-     //todo create new kamra for sent to user,done
      if($('#sendto').html()=="No one is selected")
      {
        alert('please select someone to send messages to')
@@ -398,7 +396,7 @@ function Filter()
          socket.emit('updatelogme',{'rece':rcvr,'message':mess_sent,'sender':us});
          socket.emit('updatelogot',{'rece':us,'message':mess_rec,'sender':rcvr});
        }
-       socket.emit('sendmess',{'rece':rcvr,'message':$('#myMessage').val().replace(/</g,' lessthan ').replace(/>/g,' greaterthan '),'sender':us});
+       socket.emit('sendmess',{'rece':rcvr,'message':$('#myMessage').val().replace(/</g,' lessthan ').replace(/>/g,' greaterthan '),'sender':us,'eb':'0'});
        $('#myMessage').val('');
    });
 $(document).bind('keypress', function(event) {
@@ -420,14 +418,14 @@ if( event.which === 13 && event.shiftKey)
        else
        {
          mess1="<span style='color:black;font-weight:lighter;font-size:0.55em;'>" + String(new Date()).substr(0,25) + '</span>';
-         mess2='<br/>'//'<br/>You:'+'<br/>';
+         mess2='<br/>'
          mess3=String($('#myMessage').val()).replace(/</g,' lessthan ').replace(/>/g,' greaterthan ') +'</p>'
          mess_sent='<p class="box12 sb5">' +mess1 + mess2 + mess3;
          mess_rec='<p class="box1 sb6">'+ mess1 +'<br/>' + us +':<br/>' + mess3;
          $(('#sender_' + rcvr)).append(mess_sent)
          socket.emit('updatelogme',{'rece':rcvr,'message':mess_sent,'sender':us});
          socket.emit('updatelogot',{'rece':us,'message':mess_rec,'sender':rcvr});
-         socket.emit('sendmess',{'rece':rcvr,'message':String($('#myMessage').val()).replace(/</g,' lessthan ').replace(/>/g,' greaterthan '),'sender':us});
+         socket.emit('sendmess',{'rece':rcvr,'message':String($('#myMessage').val()).replace(/</g,' lessthan ').replace(/>/g,' greaterthan '),'sender':us,'eb':'0'});
        }
        $('#myMessage').val('');
    }
@@ -452,7 +450,7 @@ if( event.which === 13 && event.shiftKey)
       <div class="w3-row" style="max-height:11vh !important; background-color:rgb(32,34,37)">
       <div class="w3-col l10 m9 s9">
         <div class="w3-container">
-          <img src="{{url_for('static', filename='assets/logovit.png')}}" height="100" width="100"><br>
+          <img src="{{url_for('static', filename='assets/mun_logo.png')}}" height="90" width="150"><br>
         </div>
       </div>
       <div class="w3-col l2 m2 s2" style="padding-left:1.2vw">

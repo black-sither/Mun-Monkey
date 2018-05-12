@@ -367,7 +367,7 @@ input[type=checkbox].w3-check:disabled+.w3-validate,input[type=radio].w3-radio:d
     margin: auto;
     position:absolute;
     /* z-index:9999; */
-    background:url("logovit.png") no-repeat center center;
+    background:url("mun_logo.png") no-repeat center center;
 }
 
 #munlogo{
